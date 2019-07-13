@@ -1,0 +1,256 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <title>PinSage论文阅读 | Hexo</title>
+
+  
+  <meta name="author" content="Wayne.wy">
+  
+
+  
+  <meta name="description" content="介绍今天介绍一篇Pinterest和Stanford研究人员合作的文章，关于图卷积神经网络在推荐系统中的应用。Graph Convolutional Neural Networks for Web-Scale Recommender Systems
+Pinterest是一家图片内容分享的网站，用户可">
+  
+
+  
+  
+  <meta name="keywords" content="embedding">
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="PinSage论文阅读">
+
+  <meta property="og:site_name" content="Hexo">
+
+  
+  <meta property="og:image" content="/favicon.ico">
+  
+  
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-5005349780815724",
+    enable_page_level_ads: true
+  });
+</script>
+
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?223eea22355699157e147870eb124b24";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  <link rel="manifest" href="/manifest.json">
+  <link href="/favicon.ico" rel="icon">
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+
+</head>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    
+
+    <header class="header-container" style="background-image: url('/images/blog-bg.jpg');">
+
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header page-scroll">
+          <button type="button" id="tglBtn" class="navbar-toggle">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Wayne.wy</a>
+        </div>
+        <div id="bosenyblog-navbar">
+          <div class="navbar-collapse" id="bs-example-navbar-collapse-6">
+            <ul class="nav navbar-nav navbar-right">
+            
+              <li><a href="/">Home</a></li>
+            
+              <li><a href="/archives">Archives</a></li>
+            
+              <li><a href="/about">About</a></li>
+            
+              <li><a href="/tags">Tags</a></li>
+            
+            </ul>
+          </div>
+        </div>
+
+    </div>
+ </nav>
+ <div class="gotop-btn">
+
+ </div>
+</header>
+
+        
+          <div class="container ">
+          <div class="row">
+            <main class="site-main posts-loop col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container" style="position: inherit;">
+            <article class="article-container ">
+
+  
+    
+    <h3 class="article-title"><span>PinSage论文阅读</span></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2019/06/12/PinSage论文阅读/" rel="bookmark">
+        <time class="entry-date published" datetime="2019-06-12T15:45:35.000Z">
+          2019-06-12
+        </time>
+      </a>
+    </span>
+    <br>
+    
+    <span id="busuanzi_container_page_pv">
+    </span>
+    
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+          <h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>今天介绍一篇Pinterest和Stanford研究人员合作的文章，关于图卷积神经网络在推荐系统中的应用。<a href="https://arxiv.org/pdf/1806.01973.pdf" target="_blank" rel="noopener">Graph Convolutional Neural Networks for Web-Scale Recommender Systems</a></p>
+<p>Pinterest是一家图片内容分享的网站，用户可以上传自己的图片（pins），创建收藏夹（boards），也可以把别人的图片保存到自己收藏夹中。文章中把图片和收藏夹之间建立了一个二部图，图和收藏夹是顶点，两者间若有收藏关系则用边连接。这样会建立一个数十亿顶点、百亿条边的图。</p>
+<h2 id="GCN"><a href="#GCN" class="headerlink" title="GCN"></a>GCN</h2><p><strong>GCN 背后的核心思想是学习如何利用神经网络迭代地聚合来自局部图邻域的特征信息。</strong>一个“卷积”操作从一个节点的单跳图邻域转换并聚集特征信息，并且通过叠加多个这样的卷积操作，信息可以传播到图的远端。</p>
+<p>现实环境所面临的主要挑战是如何将基于 GCN 的节点嵌入表示的训练和推理阶段扩展到具有数十亿个节点和数百亿个边的图中。而现有的基于Spectral GCN 的方法在训练期间都需要在全图拉普拉斯矩阵上运行，但当基础图具有数十亿个节点并且结构不断变化时，这种假设是不成立的。</p>
+<p>这篇文章提出了一种新的图卷积网络 PinSage，能够生成包含图结构和节点特征信息的有效嵌入表示，并且设计了新的训练策略，以提高模型的鲁棒性和收敛性，是一种基于Spatial的方法。</p>
+<h2 id="GCN-和推荐系统"><a href="#GCN-和推荐系统" class="headerlink" title="GCN 和推荐系统"></a>GCN 和推荐系统</h2><p>传统推荐系统通常有两类实现方式：一种是基于内容的，比如最近看了科幻题材电影，也会给你推荐其他科幻题材相关电影；另一种是基于用户-物品之间关系，比如和你相似的用户也看了什么，通常是利用协同过滤的方法。与基于内容的深度模型（如递归神经网络）不同的是，GCN 既利用了内容信息，也利用了图结构。</p>
+<p>将embedding信息用在推荐系统基本遵循以下步骤：</p>
+<ol>
+<li>收集数据</li>
+<li>训练模型</li>
+<li>生成embedding</li>
+<li>做出推荐(在embedding空间利用最近邻检索生成推荐结果)</li>
+</ol>
+<p>PinSage 充分利用了以下几个关键的思想，大大提高了 GCN 的可扩展性：</p>
+<ul>
+<li>局部卷积：传统的 GCN 算法通过将特征矩阵乘以全图拉普拉斯的幂进行图卷积。PinSage 算法通过对一个节点周围的邻域进行采样，并从该采样邻域动态构造一个计算图，来实现高效的局部卷积。这些动态构造的计算图指定了如何围绕特定节点进行局部卷积，并降低了在训练期间对整个图进行操作的需要。</li>
+<li>通过随机游走采样：取节点的整个邻域进行卷积，会产生巨大的计算图，因此我们利用采样的方法。我们开发了一种利用短随机游走对计算图进行采样的技术。该方法的另一个好处是每个节点都有一个重要性评分，我们在池化 / 聚合步骤中可以利用该评分。</li>
+<li>重要性池化：图卷积的一个核心组成部分是图中来自局部邻域的特征信息的聚合。我们引入了一种基于随机游走相似性度量的方法来衡量节点特征在这个聚合中的重要性，从而在离线评估度量中获得了 46% 的性能提升。</li>
+<li>生产者 - 消费者 minibatch 构造：设计了一个生产者 - 消费者架构，用于构造 minibatch 运算，以确保在模型训练期间最大限度地利用 GPU。一个大内存、CPU 绑定的生产者有效地对节点网络邻域进行采样并获取定义局部卷积所需的特征，而一个 GPU 绑定的 TensorFlow 模型则消费这些预定义的计算图，实现高效地 SGD 计算。</li>
+<li>有效的 MapReduce 推理：给定一个完全训练的 GCN 模型，我们设计了一个高效的 MapReduce 管道，可以将训练后的模型分布到数十亿个节点上，同时最小化重复计算。</li>
+<li>课程训练：逐步提升训练样本的难度，从而获得了 12% 的性能提升。</li>
+</ul>
+<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><h2 id="问题定义"><a href="#问题定义" class="headerlink" title="问题定义"></a>问题定义</h2><p>文章中把图片和收藏夹之间建立了一个二部图，图和收藏夹是顶点，两者间若有收藏关系则用边连接。这样会建立一个数十亿顶点、百亿条边的图。<br><img src="img/pinsage2.jpg" alt="pinsage2"></p>
+<h2 id="采样"><a href="#采样" class="headerlink" title="采样"></a>采样</h2><p>从某个顶点出发，进行random walk，统计每个节点被访问的次数作为这个顶点的权重。对每个顶点只取top K个权重最高的相邻节点作为相邻节点。</p>
+<h2 id="局部卷积"><a href="#局部卷积" class="headerlink" title="局部卷积"></a>局部卷积</h2><p><img src="img/pinsage2.jpg" alt="pinsage2"></p>
+<h2 id="堆叠卷积"><a href="#堆叠卷积" class="headerlink" title="堆叠卷积"></a>堆叠卷积</h2><p><img src="img/pinsage3.jpg" alt="pinsage3"></p>
+<h2 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h2><p>我们使用基于最大边界的损失函数hinge loss。基本思想是我们想最大化正样本的内积，即查询条目和对应的相关条目的内嵌表示。同时我们想确保负样本（查询条目和无关条目的嵌入表示）的内积比正样本的内积小，并且小的程度超过一个提前定义的边界。因此一对节点 (zq, zi) 的损失函数定义如下：<br><img src="img/pinsage4.jpg" alt="pinsage3"></p>
+<h2 id="负采样"><a href="#负采样" class="headerlink" title="负采样"></a>负采样</h2><p>在每个minibatch里采样相同的500个负样本，包括一些“难负样本”：即与查询条目 q 相关，但是不如正样本 i 相关程度高的负样本。它们是通过对图中条目根据个性化的 PageRank 分数进行排序而生成的。排位在 2000-5000 的条目被随机采样为“难负样本”。</p>
+<p>在训练的第一个阶段，不使用“难负样本”，使算法在参数空间中快速找到损失相对较小的区域。然后，我们在随后的训练中添加“难负样本”，让模型学习如何区分高度相关的图钉和仅轻微相关的图钉。在训练的第 n 个阶段，我们将 n-1 个“难负样本”添加到每个样本的负样本集合中。</p>
+<h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><p><a href="https://mp.weixin.qq.com/s/fxVsN2dDmayxJfxBRIXHhQ" target="_blank" rel="noopener">解读PingSage</a></p>
+
+      
+    </div>
+    
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/embedding/">embedding</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+  
+    
+    
+  
+</article>
+   
+    <div id="toc" class="toc-article ">
+    <div class="toc-title">目录</div>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#介绍"><span class="toc-number">1.</span> <span class="toc-text">介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#GCN"><span class="toc-number">1.1.</span> <span class="toc-text">GCN</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GCN-和推荐系统"><span class="toc-number">1.2.</span> <span class="toc-text">GCN 和推荐系统</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#方法"><span class="toc-number">2.</span> <span class="toc-text">方法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#问题定义"><span class="toc-number">2.1.</span> <span class="toc-text">问题定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#采样"><span class="toc-number">2.2.</span> <span class="toc-text">采样</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#局部卷积"><span class="toc-number">2.3.</span> <span class="toc-text">局部卷积</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#堆叠卷积"><span class="toc-number">2.4.</span> <span class="toc-text">堆叠卷积</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#损失函数"><span class="toc-number">2.5.</span> <span class="toc-text">损失函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#负采样"><span class="toc-number">2.6.</span> <span class="toc-text">负采样</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#参考链接"><span class="toc-number">3.</span> <span class="toc-text">参考链接</span></a></li></ol>
+</div>
+
+
+
+
+            </main>
+          </div>
+        </div>
+       
+    <footer class="site-footer">
+  <p class="site-info">
+    Proudly powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and
+    Theme by <a href="https://github.com/BosenY/Lap" target="_blank">Lap</a>
+    <br><span id="busuanzi_container_site_uv"> 
+  本站访客数<span id="busuanzi_value_site_uv"></span>人次
+</span>
+    <br>
+    
+      
+        &copy; 2019 Wayne.wy
+      
+    
+  </p>
+</footer>
+    
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-92842840-1', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+
+  </div>
+
+</div>
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.bootcss.com/vue/2.5.13/vue.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="/js/index.js"></script>
+<script src="/js/search.js"></script>
+
+</body>
+</html>
