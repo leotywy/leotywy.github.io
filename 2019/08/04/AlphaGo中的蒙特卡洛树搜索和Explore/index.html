@@ -3,26 +3,31 @@
 <head><meta name="generator" content="Hexo 3.8.0">
   <meta charset="utf-8">
   
-  <title>Hello World | Wayne.wy&#39;s blog</title>
+  <title>AlphaGo中的蒙特卡洛树搜索和Explore | Wayne.wy&#39;s blog</title>
 
   
   <meta name="author" content="Wayne.wy">
   
 
   
-  <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in ">
+  <meta name="description" content="AlphaGo这个系统主要由几个部分组成：
+
+走棋网络（Policy Network），给定当前局面，预测/采样下一步的走棋。
+快速走子（Fast rollout），目标和1一样，但在适当牺牲走棋质量的条件下，速度要比1快1000倍。
+估值网络（Value Network），给定当前局面，估计是白胜还是黑胜。
+蒙特卡罗树搜索（Monte Carlo Tree Search，MCTS)，把以上这三个部分连起来，形成一个完整的系统。">
   
 
   
   
-  <meta name="keywords" content>
+  <meta name="keywords" content="EE,Reinforcement Learning">
   
 
   <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
-  <meta property="og:title" content="Hello World">
+  <meta property="og:title" content="AlphaGo中的蒙特卡洛树搜索和Explore">
 
   <meta property="og:site_name" content="Wayne.wy&#39;s blog">
 
@@ -115,15 +120,15 @@ var _hmt = _hmt || [];
 
   
     
-    <h3 class="article-title"><span>Hello World</span></h3>
+    <h3 class="article-title"><span>AlphaGo中的蒙特卡洛树搜索和Explore</span></h3>
     
   
 
   <div class="article-top-meta">
     <span class="posted-on">
-      <a href="/2019/06/12/hello-world/" rel="bookmark">
-        <time class="entry-date published" datetime="2019-06-11T16:21:14.732Z">
-          2019-06-12
+      <a href="/2019/08/04/AlphaGo中的蒙特卡洛树搜索和Explore/" rel="bookmark">
+        <time class="entry-date published" datetime="2019-08-04T13:11:09.000Z">
+          2019-08-04
         </time>
       </a>
     </span>
@@ -140,19 +145,23 @@ var _hmt = _hmt || [];
   <div class="article-content">
     <div class="entry">
       
-          <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
+          <p><a href="https://www.nature.com/articles/nature16961" target="_blank" rel="noopener">AlphaGo</a>这个系统主要由几个部分组成：</p>
+<ol>
+<li>走棋网络（Policy Network），给定当前局面，预测/采样下一步的走棋。</li>
+<li>快速走子（Fast rollout），目标和1一样，但在适当牺牲走棋质量的条件下，速度要比1快1000倍。</li>
+<li>估值网络（Value Network），给定当前局面，估计是白胜还是黑胜。</li>
+<li>蒙特卡罗树搜索（Monte Carlo Tree Search，MCTS)，把以上这三个部分连起来，形成一个完整的系统。</li>
+</ol>
+<a id="more"></a>
 
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+<p><img src="/img/alphago1.jpg" alt="alphago1"><br>利用人类棋局，训练一个快速走子策略p_pai和一个监督学习的策略网络p_delta。再通过机器自我对弈结合强化学习策略网络，训练得到一个估值网络v，预测哪个选手获胜。策略网络输入当前棋局状态s，输出关于下棋动作a的概率分布。估值网络输出一个标量值用来预测棋局的状态。<br><img src="/img/alphago2.jpg" alt="alphago2"><br>通过蒙特卡洛树搜索将以上策略做一简要介绍，蒙特卡洛树搜索主要可以分为以下四步，并且不断循环执行。</p>
+<ol>
+<li>Selection. 在当前局面下选择最优策略，选择动作估值Q+额外奖励u(P)最大走子策略。动作估值Q是由估值网络V和快速走子策略综合计算得到。u(P)这里同时考虑了走棋网络P的结果和树节点被访问次数，被访问次数用来做explore，访问次数越少会有一个越大的奖励分，鼓励去探索这些节点。</li>
+<li>Expansion. 在访问达到一定次数后叶节点可能会被展开，新的被策略网络p执行一次，然后结果概率被存储下来作为每个下棋动作的先验概率。</li>
+<li>Evaluation. 在一次模拟的结尾，叶节点由两种方式评估：估值网络V和运行一个默认走子策略直到结束。用参数lambda调节两者权重。</li>
+<li>Backup. 更新下棋动作估值Q。</li>
+</ol>
+<p>参考链接<br><a href="https://zhuanlan.zhihu.com/p/20607684" target="_blank" rel="noopener">田渊栋的解读</a><br><a href="https://blog.csdn.net/u013390476/article/details/50925347" target="_blank" rel="noopener">论文翻译</a><br><a href="https://zhuanlan.zhihu.com/p/20704651" target="_blank" rel="noopener">知乎链接</a></p>
 
       
     </div>
@@ -164,6 +173,13 @@ var _hmt = _hmt || [];
 
     
 
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/EE/">EE</a><a href="/tags/Reinforcement-Learning/">Reinforcement Learning</a>
+    </span>
     
 
     </div>
@@ -178,7 +194,7 @@ var _hmt = _hmt || [];
    
     <div id="toc" class="toc-article ">
     <div class="toc-title">目录</div>
-    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Quick-Start"><span class="toc-number">1.</span> <span class="toc-text">Quick Start</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Create-a-new-post"><span class="toc-number">1.1.</span> <span class="toc-text">Create a new post</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Run-server"><span class="toc-number">1.2.</span> <span class="toc-text">Run server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Generate-static-files"><span class="toc-number">1.3.</span> <span class="toc-text">Generate static files</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Deploy-to-remote-sites"><span class="toc-number">1.4.</span> <span class="toc-text">Deploy to remote sites</span></a></li></ol></li></ol>
+    
 </div>
 
 

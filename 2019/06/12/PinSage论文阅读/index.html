@@ -3,7 +3,7 @@
 <head><meta name="generator" content="Hexo 3.8.0">
   <meta charset="utf-8">
   
-  <title>PinSage论文阅读 | Hexo</title>
+  <title>PinSage论文阅读 | Wayne.wy&#39;s blog</title>
 
   
   <meta name="author" content="Wayne.wy">
@@ -11,7 +11,7 @@
 
   
   <meta name="description" content="介绍今天介绍一篇Pinterest和Stanford研究人员合作的文章，关于图卷积神经网络在推荐系统中的应用。Graph Convolutional Neural Networks for Web-Scale Recommender Systems
-Pinterest是一家图片内容分享的网站，用户可">
+Pinterest是一家图片内容分享的网站，用户可以上传自己的图片（pins），创建收藏夹（boards），也可以把别人的图片保存到自己收藏夹中。文章中把图片和收藏夹之间建立了一个二部图，图和收藏夹是顶点，两者间若有收藏关系则用边连接。这样会建立一个数十亿顶点、百亿条边的图。">
   
 
   
@@ -25,7 +25,7 @@ Pinterest是一家图片内容分享的网站，用户可">
 
   <meta property="og:title" content="PinSage论文阅读">
 
-  <meta property="og:site_name" content="Hexo">
+  <meta property="og:site_name" content="Wayne.wy&#39;s blog">
 
   
   <meta property="og:image" content="/favicon.ico">
@@ -54,7 +54,7 @@ var _hmt = _hmt || [];
   <link rel="manifest" href="/manifest.json">
   <link href="/favicon.ico" rel="icon">
 
-  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  <link rel="alternate" href="/atom.xml" title="Wayne.wy&#39;s blog" type="application/atom+xml">
   <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/css/base/bootstrap.min.css" media="screen" type="text/css">
   <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
@@ -143,6 +143,8 @@ var _hmt = _hmt || [];
       
           <h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>今天介绍一篇Pinterest和Stanford研究人员合作的文章，关于图卷积神经网络在推荐系统中的应用。<a href="https://arxiv.org/pdf/1806.01973.pdf" target="_blank" rel="noopener">Graph Convolutional Neural Networks for Web-Scale Recommender Systems</a></p>
 <p>Pinterest是一家图片内容分享的网站，用户可以上传自己的图片（pins），创建收藏夹（boards），也可以把别人的图片保存到自己收藏夹中。文章中把图片和收藏夹之间建立了一个二部图，图和收藏夹是顶点，两者间若有收藏关系则用边连接。这样会建立一个数十亿顶点、百亿条边的图。</p>
+<a id="more"></a>
+
 <h2 id="GCN"><a href="#GCN" class="headerlink" title="GCN"></a>GCN</h2><p><strong>GCN 背后的核心思想是学习如何利用神经网络迭代地聚合来自局部图邻域的特征信息。</strong>一个“卷积”操作从一个节点的单跳图邻域转换并聚集特征信息，并且通过叠加多个这样的卷积操作，信息可以传播到图的远端。</p>
 <p>现实环境所面临的主要挑战是如何将基于 GCN 的节点嵌入表示的训练和推理阶段扩展到具有数十亿个节点和数百亿个边的图中。而现有的基于Spectral GCN 的方法在训练期间都需要在全图拉普拉斯矩阵上运行，但当基础图具有数十亿个节点并且结构不断变化时，这种假设是不成立的。</p>
 <p>这篇文章提出了一种新的图卷积网络 PinSage，能够生成包含图结构和节点特征信息的有效嵌入表示，并且设计了新的训练策略，以提高模型的鲁棒性和收敛性，是一种基于Spatial的方法。</p>
@@ -163,11 +165,11 @@ var _hmt = _hmt || [];
 <li>有效的 MapReduce 推理：给定一个完全训练的 GCN 模型，我们设计了一个高效的 MapReduce 管道，可以将训练后的模型分布到数十亿个节点上，同时最小化重复计算。</li>
 <li>课程训练：逐步提升训练样本的难度，从而获得了 12% 的性能提升。</li>
 </ul>
-<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><h2 id="问题定义"><a href="#问题定义" class="headerlink" title="问题定义"></a>问题定义</h2><p>文章中把图片和收藏夹之间建立了一个二部图，图和收藏夹是顶点，两者间若有收藏关系则用边连接。这样会建立一个数十亿顶点、百亿条边的图。<br><img src="img/pinsage2.jpg" alt="pinsage2"></p>
+<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><h2 id="问题定义"><a href="#问题定义" class="headerlink" title="问题定义"></a>问题定义</h2><p>文章中把图片和收藏夹之间建立了一个二部图，图和收藏夹是顶点，两者间若有收藏关系则用边连接。这样会建立一个数十亿顶点、百亿条边的图。<br><img src="/img/pinsage1.jpg" alt="pinsage2"></p>
 <h2 id="采样"><a href="#采样" class="headerlink" title="采样"></a>采样</h2><p>从某个顶点出发，进行random walk，统计每个节点被访问的次数作为这个顶点的权重。对每个顶点只取top K个权重最高的相邻节点作为相邻节点。</p>
-<h2 id="局部卷积"><a href="#局部卷积" class="headerlink" title="局部卷积"></a>局部卷积</h2><p><img src="img/pinsage2.jpg" alt="pinsage2"></p>
-<h2 id="堆叠卷积"><a href="#堆叠卷积" class="headerlink" title="堆叠卷积"></a>堆叠卷积</h2><p><img src="img/pinsage3.jpg" alt="pinsage3"></p>
-<h2 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h2><p>我们使用基于最大边界的损失函数hinge loss。基本思想是我们想最大化正样本的内积，即查询条目和对应的相关条目的内嵌表示。同时我们想确保负样本（查询条目和无关条目的嵌入表示）的内积比正样本的内积小，并且小的程度超过一个提前定义的边界。因此一对节点 (zq, zi) 的损失函数定义如下：<br><img src="img/pinsage4.jpg" alt="pinsage3"></p>
+<h2 id="局部卷积"><a href="#局部卷积" class="headerlink" title="局部卷积"></a>局部卷积</h2><p><img src="/img/pinsage2.jpg" alt="pinsage2"></p>
+<h2 id="堆叠卷积"><a href="#堆叠卷积" class="headerlink" title="堆叠卷积"></a>堆叠卷积</h2><p><img src="/img/pinsage3.jpg" alt="pinsage3"></p>
+<h2 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h2><p>我们使用基于最大边界的损失函数hinge loss。基本思想是我们想最大化正样本的内积，即查询条目和对应的相关条目的内嵌表示。同时我们想确保负样本（查询条目和无关条目的嵌入表示）的内积比正样本的内积小，并且小的程度超过一个提前定义的边界。因此一对节点 (zq, zi) 的损失函数定义如下：<br><img src="/img/pinsage4.jpg" alt="pinsage3"></p>
 <h2 id="负采样"><a href="#负采样" class="headerlink" title="负采样"></a>负采样</h2><p>在每个minibatch里采样相同的500个负样本，包括一些“难负样本”：即与查询条目 q 相关，但是不如正样本 i 相关程度高的负样本。它们是通过对图中条目根据个性化的 PageRank 分数进行排序而生成的。排位在 2000-5000 的条目被随机采样为“难负样本”。</p>
 <p>在训练的第一个阶段，不使用“难负样本”，使算法在参数空间中快速找到损失相对较小的区域。然后，我们在随后的训练中添加“难负样本”，让模型学习如何区分高度相关的图钉和仅轻微相关的图钉。在训练的第 n 个阶段，我们将 n-1 个“难负样本”添加到每个样本的负样本集合中。</p>
 <h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><p><a href="https://mp.weixin.qq.com/s/fxVsN2dDmayxJfxBRIXHhQ" target="_blank" rel="noopener">解读PingSage</a></p>
