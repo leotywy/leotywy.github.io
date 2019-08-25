@@ -1,0 +1,240 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <title>tf word2vec代码阅读 | Wayne.wy&#39;s blog</title>
+
+  
+  <meta name="author" content="Wayne.wy">
+  
+
+  
+  <meta name="description" content="源码地址
+Setp1：下载数据。这里会从下面url中下载text8.zip数据，并做解压操作，提取出数据。12345678910111213141516171819202122232425262728293031323334def maybe_download(filename, expected_bytes, sha256=None):  &#34;&#34;&#34;如果数据文件不存在就下载，并且保证文件大小正确  输入：文件名，文件期望大小，文件哈希签名  输出：本地文件名  &#34;&#34;&#34;  local_filename = os.path.join(gettempdir(), filename)  if not os.path.exists(local_filename):    local_filename, _ = urllib.request.urlretrieve(url + filename,                                                   local_filename)  statinfo = os.stat(local_filename)  if sha256 and _hash_file(local_filename) != sha256:    raise Exception(&#39;Failed to verify &#39; + local_filename + &#39; due to hash &#39;                    &#39;mismatch. Can you get to it with a browser?&#39;)  if statinfo.st_size == expected_bytes:    print(&#39;Found and verified&#39;, filename)  else:    print(statinfo.st_size)    raise Exception(&#39;Failed to verify &#39; + local_filename +                    &#39;. Can you get to it with a browser?&#39;)  return local_filenamedef read_data(filename):  &#34;&#34;&#34;解压出第一个文件，并转化成string形式数据  输入：被解压文件名  输出：解压出的string格式数据  tf.compat.as_str：alias tf.compat.as_text，Returns the input as a unicode string&#34;&#34;&#34;  with zipfile.ZipFile(filename) as f:    data = tf.compat.as_str(f.read(f.namelist()[0])).split()  return datavocabulary = read_data(filename)print(&#39;Data size&#39;, len(vocabulary))">
+  
+
+  
+  
+  <meta name="keywords" content="tensorflow,nlp">
+  
+
+  <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta property="og:title" content="tf word2vec代码阅读">
+
+  <meta property="og:site_name" content="Wayne.wy&#39;s blog">
+
+  
+  <meta property="og:image" content="/favicon.ico">
+  
+  
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-5005349780815724",
+    enable_page_level_ads: true
+  });
+</script>
+
+  
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?223eea22355699157e147870eb124b24";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+  <link rel="manifest" href="/manifest.json">
+  <link href="/favicon.ico" rel="icon">
+
+  <link rel="alternate" href="/atom.xml" title="Wayne.wy&#39;s blog" type="application/atom+xml">
+  <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+
+</head>
+
+
+<body>
+<div class="blog">
+  <div class="content">
+
+    
+
+    <header class="header-container" style="background-image: url('/images/blog-bg.jpg');">
+
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header page-scroll">
+          <button type="button" id="tglBtn" class="navbar-toggle">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Wayne.wy</a>
+        </div>
+        <div id="bosenyblog-navbar">
+          <div class="navbar-collapse" id="bs-example-navbar-collapse-6">
+            <ul class="nav navbar-nav navbar-right">
+            
+              <li><a href="/">Home</a></li>
+            
+              <li><a href="/archives">Archives</a></li>
+            
+              <li><a href="/about">About</a></li>
+            
+              <li><a href="/tags">Tags</a></li>
+            
+            </ul>
+          </div>
+        </div>
+
+    </div>
+ </nav>
+ <div class="gotop-btn">
+
+ </div>
+</header>
+
+        
+          <div class="container ">
+          <div class="row">
+            <main class="site-main posts-loop col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container" style="position: inherit;">
+            <article class="article-container ">
+
+  
+    
+    <h3 class="article-title"><span>tf word2vec代码阅读</span></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2019/08/25/tf-word2vec代码阅读/" rel="bookmark">
+        <time class="entry-date published" datetime="2019-08-25T14:40:03.000Z">
+          2019-08-25
+        </time>
+      </a>
+    </span>
+    <br>
+    
+    <span id="busuanzi_container_page_pv">
+    </span>
+    
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+      
+          <p><a href="https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/tutorials/word2vec/word2vec_basic.py" target="_blank" rel="noopener">源码地址</a></p>
+<h2 id="Setp1：下载数据。这里会从下面url中下载text8-zip数据，并做解压操作，提取出数据。"><a href="#Setp1：下载数据。这里会从下面url中下载text8-zip数据，并做解压操作，提取出数据。" class="headerlink" title="Setp1：下载数据。这里会从下面url中下载text8.zip数据，并做解压操作，提取出数据。"></a>Setp1：下载数据。这里会从下面url中下载text8.zip数据，并做解压操作，提取出数据。</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">maybe_download</span><span class="params">(filename, expected_bytes, sha256=None)</span>:</span></span><br><span class="line">  <span class="string">"""如果数据文件不存在就下载，并且保证文件大小正确</span></span><br><span class="line"><span class="string">  输入：文件名，文件期望大小，文件哈希签名</span></span><br><span class="line"><span class="string">  输出：本地文件名</span></span><br><span class="line"><span class="string">  """</span></span><br><span class="line">  local_filename = os.path.join(gettempdir(), filename)</span><br><span class="line">  <span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(local_filename):</span><br><span class="line">    local_filename, _ = urllib.request.urlretrieve(url + filename,</span><br><span class="line">                                                   local_filename)</span><br><span class="line">  statinfo = os.stat(local_filename)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> sha256 <span class="keyword">and</span> _hash_file(local_filename) != sha256:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">'Failed to verify '</span> + local_filename + <span class="string">' due to hash '</span></span><br><span class="line">                    <span class="string">'mismatch. Can you get to it with a browser?'</span>)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> statinfo.st_size == expected_bytes:</span><br><span class="line">    print(<span class="string">'Found and verified'</span>, filename)</span><br><span class="line">  <span class="keyword">else</span>:</span><br><span class="line">    print(statinfo.st_size)</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">'Failed to verify '</span> + local_filename +</span><br><span class="line">                    <span class="string">'. Can you get to it with a browser?'</span>)</span><br><span class="line">  <span class="keyword">return</span> local_filename</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">read_data</span><span class="params">(filename)</span>:</span></span><br><span class="line">  <span class="string">"""解压出第一个文件，并转化成string形式数据</span></span><br><span class="line"><span class="string">  输入：被解压文件名</span></span><br><span class="line"><span class="string">  输出：解压出的string格式数据</span></span><br><span class="line"><span class="string">  tf.compat.as_str：alias tf.compat.as_text，Returns the input as a unicode string"""</span></span><br><span class="line">  <span class="keyword">with</span> zipfile.ZipFile(filename) <span class="keyword">as</span> f:</span><br><span class="line">    data = tf.compat.as_str(f.read(f.namelist()[<span class="number">0</span>])).split()</span><br><span class="line">  <span class="keyword">return</span> data</span><br><span class="line"></span><br><span class="line">vocabulary = read_data(filename)</span><br><span class="line">print(<span class="string">'Data size'</span>, len(vocabulary))</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+<h2 id="Step2：构建词典并且把稀有词用UNK标记替换。"><a href="#Step2：构建词典并且把稀有词用UNK标记替换。" class="headerlink" title="Step2：构建词典并且把稀有词用UNK标记替换。"></a>Step2：构建词典并且把稀有词用UNK标记替换。</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_dataset</span><span class="params">(words, n_words)</span>:</span></span><br><span class="line">  <span class="string">"""处理输入数据，构建数据集</span></span><br><span class="line"><span class="string">  输入：原始句子，单词表大小</span></span><br><span class="line"><span class="string">  输出：data: 由下标表示的原始句子数据</span></span><br><span class="line"><span class="string">        conut：单词及其出现次数的Map</span></span><br><span class="line"><span class="string">        dictionary：单词到下标词典，下标随着单词出现次数越多下标越大</span></span><br><span class="line"><span class="string">        reversed_dictionary：下标到单词逆词典"""</span></span><br><span class="line">  count = [[<span class="string">'UNK'</span>, <span class="number">-1</span>]]</span><br><span class="line">  count.extend(collections.Counter(words).most_common(n_words - <span class="number">1</span>))</span><br><span class="line">  dictionary = &#123;&#125;</span><br><span class="line">  <span class="keyword">for</span> word, _ <span class="keyword">in</span> count:</span><br><span class="line">    dictionary[word] = len(dictionary)</span><br><span class="line">  data = []</span><br><span class="line">  unk_count = <span class="number">0</span></span><br><span class="line">  <span class="keyword">for</span> word <span class="keyword">in</span> words:</span><br><span class="line">    index = dictionary.get(word, <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">if</span> index == <span class="number">0</span>:  <span class="comment"># dictionary['UNK']</span></span><br><span class="line">      unk_count += <span class="number">1</span></span><br><span class="line">    data.append(index)</span><br><span class="line">  count[<span class="number">0</span>][<span class="number">1</span>] = unk_count</span><br><span class="line">  reversed_dictionary = dict(zip(dictionary.values(), dictionary.keys()))</span><br><span class="line">  <span class="keyword">return</span> data, count, dictionary, reversed_dictionary</span><br></pre></td></tr></table></figure>
+
+<h2 id="Step3：生成训练skip-gram模型用的批次数据。"><a href="#Step3：生成训练skip-gram模型用的批次数据。" class="headerlink" title="Step3：生成训练skip-gram模型用的批次数据。"></a>Step3：生成训练skip-gram模型用的批次数据。</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">generate_batch</span><span class="params">(batch_size, num_skips, skip_window)</span>:</span></span><br><span class="line">  <span class="string">"""</span></span><br><span class="line"><span class="string">  输入：batch_size：批量大小</span></span><br><span class="line"><span class="string">        num_skips：skip词数</span></span><br><span class="line"><span class="string">        skip_window：skip窗口大小</span></span><br><span class="line"><span class="string">  输出：batch: 输入数据</span></span><br><span class="line"><span class="string">        label：输出数据，即标签</span></span><br><span class="line"><span class="string">  """</span></span><br><span class="line">  <span class="keyword">global</span> data_index</span><br><span class="line">  <span class="keyword">assert</span> batch_size % num_skips == <span class="number">0</span></span><br><span class="line">  <span class="keyword">assert</span> num_skips &lt;= <span class="number">2</span> * skip_window</span><br><span class="line">  batch = np.ndarray(shape=(batch_size), dtype=np.int32)</span><br><span class="line">  labels = np.ndarray(shape=(batch_size, <span class="number">1</span>), dtype=np.int32)</span><br><span class="line">  span = <span class="number">2</span> * skip_window + <span class="number">1</span>  <span class="comment"># [ skip_window target skip_window ]</span></span><br><span class="line">  buffer = collections.deque(maxlen=span)  <span class="comment"># pylint: disable=redefined-builtin</span></span><br><span class="line">  <span class="keyword">if</span> data_index + span &gt; len(data):</span><br><span class="line">    data_index = <span class="number">0</span></span><br><span class="line">  buffer.extend(data[data_index:data_index + span])</span><br><span class="line">  data_index += span</span><br><span class="line">  <span class="keyword">for</span> i <span class="keyword">in</span> range(batch_size // num_skips):</span><br><span class="line">    context_words = [w <span class="keyword">for</span> w <span class="keyword">in</span> range(span) <span class="keyword">if</span> w != skip_window]</span><br><span class="line">    words_to_use = random.sample(context_words, num_skips)</span><br><span class="line">    <span class="keyword">for</span> j, context_word <span class="keyword">in</span> enumerate(words_to_use):</span><br><span class="line">      batch[i * num_skips + j] = buffer[skip_window]</span><br><span class="line">      labels[i * num_skips + j, <span class="number">0</span>] = buffer[context_word]</span><br><span class="line">    <span class="keyword">if</span> data_index == len(data):</span><br><span class="line">      buffer.extend(data[<span class="number">0</span>:span])</span><br><span class="line">      data_index = span</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">      buffer.append(data[data_index])</span><br><span class="line">      data_index += <span class="number">1</span></span><br><span class="line">  <span class="comment"># Backtrack a little bit to avoid skipping words in the end of a batch</span></span><br><span class="line">  data_index = (data_index + len(data) - span) % len(data)</span><br><span class="line">  <span class="keyword">return</span> batch, labels</span><br></pre></td></tr></table></figure>
+
+<h2 id="Step4：构建skip-gram模型。"><a href="#Step4：构建skip-gram模型。" class="headerlink" title="Step4：构建skip-gram模型。"></a>Step4：构建skip-gram模型。</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">batch_size = <span class="number">128</span></span><br><span class="line">embedding_size = <span class="number">128</span>  <span class="comment"># embedding向量维度</span></span><br><span class="line">skip_window = <span class="number">1</span>  <span class="comment"># 分别考虑左或右多少词</span></span><br><span class="line">num_skips = <span class="number">2</span>  <span class="comment"># 每个词被用作重复生成label多少次</span></span><br><span class="line">num_sampled = <span class="number">64</span>  <span class="comment"># 负样本采样次数</span></span><br><span class="line"></span><br><span class="line">graph = tf.Graph()</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> graph.as_default():</span><br><span class="line"></span><br><span class="line">  <span class="comment"># 输入数据</span></span><br><span class="line">  <span class="keyword">with</span> tf.name_scope(<span class="string">'inputs'</span>):</span><br><span class="line">    train_inputs = tf.placeholder(tf.int32, shape=[batch_size])</span><br><span class="line">    train_labels = tf.placeholder(tf.int32, shape=[batch_size, <span class="number">1</span>])</span><br><span class="line">    valid_dataset = tf.constant(valid_examples, dtype=tf.int32)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">with</span> tf.device(<span class="string">'/cpu:0'</span>):</span><br><span class="line">    <span class="comment"># 初始化embedding矩阵, 并查找对应embedding向量</span></span><br><span class="line">    <span class="keyword">with</span> tf.name_scope(<span class="string">'embeddings'</span>):</span><br><span class="line">      embeddings = tf.Variable(</span><br><span class="line">          tf.random_uniform([vocabulary_size, embedding_size], <span class="number">-1.0</span>, <span class="number">1.0</span>))</span><br><span class="line">      embed = tf.nn.embedding_lookup(embeddings, train_inputs)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Construct the variables for the NCE loss</span></span><br><span class="line">    <span class="keyword">with</span> tf.name_scope(<span class="string">'weights'</span>):</span><br><span class="line">      nce_weights = tf.Variable(</span><br><span class="line">          tf.truncated_normal([vocabulary_size, embedding_size],</span><br><span class="line">                              stddev=<span class="number">1.0</span> / math.sqrt(embedding_size)))</span><br><span class="line">    <span class="keyword">with</span> tf.name_scope(<span class="string">'biases'</span>):</span><br><span class="line">      nce_biases = tf.Variable(tf.zeros([vocabulary_size]))</span><br><span class="line"></span><br><span class="line">  <span class="comment"># Compute the average NCE loss for the batch.</span></span><br><span class="line">  <span class="comment"># tf.nce_loss automatically draws a new sample of the negative labels each</span></span><br><span class="line">  <span class="comment"># time we evaluate the loss.</span></span><br><span class="line">  <span class="comment"># Explanation of the meaning of NCE loss and why choosing NCE over tf.nn.sampled_softmax_loss:</span></span><br><span class="line">  <span class="comment">#   http://mccormickml.com/2016/04/19/word2vec-tutorial-the-skip-gram-model/</span></span><br><span class="line">  <span class="comment">#   http://papers.nips.cc/paper/5165-learning-word-embeddings-efficiently-with-noise-contrastive-estimation.pdf</span></span><br><span class="line">  <span class="keyword">with</span> tf.name_scope(<span class="string">'loss'</span>):</span><br><span class="line">    loss = tf.reduce_mean(</span><br><span class="line">        tf.nn.nce_loss(</span><br><span class="line">            weights=nce_weights,</span><br><span class="line">            biases=nce_biases,</span><br><span class="line">            labels=train_labels,</span><br><span class="line">            inputs=embed,</span><br><span class="line">            num_sampled=num_sampled,</span><br><span class="line">            num_classes=vocabulary_size))</span><br><span class="line"></span><br><span class="line">  <span class="comment"># 在summary中记录loss</span></span><br><span class="line">  tf.summary.scalar(<span class="string">'loss'</span>, loss)</span><br><span class="line"></span><br><span class="line">  <span class="comment"># Construct the SGD optimizer using a learning rate of 1.0.</span></span><br><span class="line">  <span class="keyword">with</span> tf.name_scope(<span class="string">'optimizer'</span>):</span><br><span class="line">    optimizer = tf.train.GradientDescentOptimizer(<span class="number">1.0</span>).minimize(loss)</span><br><span class="line"></span><br><span class="line">  <span class="comment"># Compute the cosine similarity between minibatch examples and all</span></span><br><span class="line">  <span class="comment"># embeddings.</span></span><br><span class="line">  norm = tf.sqrt(tf.reduce_sum(tf.square(embeddings), <span class="number">1</span>, keepdims=<span class="literal">True</span>))</span><br><span class="line">  normalized_embeddings = embeddings / norm</span><br><span class="line">  valid_embeddings = tf.nn.embedding_lookup(normalized_embeddings,</span><br><span class="line">                                            valid_dataset)</span><br><span class="line">  similarity = tf.matmul(</span><br><span class="line">      valid_embeddings, normalized_embeddings, transpose_b=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">  <span class="comment"># Merge all summaries.</span></span><br><span class="line">  merged = tf.summary.merge_all()</span><br><span class="line"></span><br><span class="line">  <span class="comment"># 所有变量初始化</span></span><br><span class="line">  init = tf.global_variables_initializer()</span><br><span class="line"></span><br><span class="line">  <span class="comment"># 创建 saver，保存模型用</span></span><br><span class="line">  saver = tf.train.Saver()</span><br></pre></td></tr></table></figure>
+
+<h2 id="Step5：训练模型。"><a href="#Step5：训练模型。" class="headerlink" title="Step5：训练模型。"></a>Step5：训练模型。</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> tf.compat.v1.Session(graph=graph) <span class="keyword">as</span> session:</span><br><span class="line">  <span class="comment"># 写入训练summaries.</span></span><br><span class="line">  writer = tf.summary.FileWriter(log_dir, session.graph)</span><br><span class="line"></span><br><span class="line">  <span class="comment"># We must initialize all variables before we use them.</span></span><br><span class="line">  init.run()</span><br><span class="line">  print(<span class="string">'Initialized'</span>)</span><br><span class="line"></span><br><span class="line">  average_loss = <span class="number">0</span></span><br><span class="line">  <span class="keyword">for</span> step <span class="keyword">in</span> xrange(num_steps):</span><br><span class="line">    batch_inputs, batch_labels = generate_batch(batch_size, num_skips,</span><br><span class="line">                                                skip_window)</span><br><span class="line">    feed_dict = &#123;train_inputs: batch_inputs, train_labels: batch_labels&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Define metadata variable.</span></span><br><span class="line">    run_metadata = tf.RunMetadata()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># We perform one update step by evaluating the optimizer op (including it</span></span><br><span class="line">    <span class="comment"># in the list of returned values for session.run()</span></span><br><span class="line">    <span class="comment"># Also, evaluate the merged op to get all summaries from the returned</span></span><br><span class="line">    <span class="comment"># "summary" variable. Feed metadata variable to session for visualizing</span></span><br><span class="line">    <span class="comment"># the graph in TensorBoard.</span></span><br><span class="line">    _, summary, loss_val = session.run([optimizer, merged, loss],</span><br><span class="line">                                       feed_dict=feed_dict,</span><br><span class="line">                                       run_metadata=run_metadata)</span><br><span class="line">    average_loss += loss_val</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Add returned summaries to writer in each step.</span></span><br><span class="line">    writer.add_summary(summary, step)</span><br><span class="line">    <span class="comment"># Add metadata to visualize the graph for the last run.</span></span><br><span class="line">    <span class="keyword">if</span> step == (num_steps - <span class="number">1</span>):</span><br><span class="line">      writer.add_run_metadata(run_metadata, <span class="string">'step%d'</span> % step)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> step % <span class="number">2000</span> == <span class="number">0</span>:</span><br><span class="line">      <span class="keyword">if</span> step &gt; <span class="number">0</span>:</span><br><span class="line">        average_loss /= <span class="number">2000</span></span><br><span class="line">      <span class="comment"># The average loss is an estimate of the loss over the last 2000</span></span><br><span class="line">      <span class="comment"># batches.</span></span><br><span class="line">      print(<span class="string">'Average loss at step '</span>, step, <span class="string">': '</span>, average_loss)</span><br><span class="line">      average_loss = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 计算词的最近邻词, 此步骤话费时间较长</span></span><br><span class="line">    <span class="keyword">if</span> step % <span class="number">10000</span> == <span class="number">0</span>:</span><br><span class="line">      sim = similarity.eval()</span><br><span class="line">      <span class="keyword">for</span> i <span class="keyword">in</span> xrange(valid_size):</span><br><span class="line">        valid_word = reverse_dictionary[valid_examples[i]]</span><br><span class="line">        top_k = <span class="number">8</span>  <span class="comment"># number of nearest neighbors</span></span><br><span class="line">        nearest = (-sim[i, :]).argsort()[<span class="number">1</span>:top_k + <span class="number">1</span>]</span><br><span class="line">        log_str = <span class="string">'Nearest to %s:'</span> % valid_word</span><br><span class="line">        <span class="keyword">for</span> k <span class="keyword">in</span> xrange(top_k):</span><br><span class="line">          close_word = reverse_dictionary[nearest[k]]</span><br><span class="line">          log_str = <span class="string">'%s %s,'</span> % (log_str, close_word)</span><br><span class="line">        print(log_str)</span><br><span class="line">  final_embeddings = normalized_embeddings.eval()</span><br><span class="line"></span><br><span class="line">  <span class="comment"># Write corresponding labels for the embeddings.</span></span><br><span class="line">  <span class="keyword">with</span> open(log_dir + <span class="string">'/metadata.tsv'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> xrange(vocabulary_size):</span><br><span class="line">      f.write(reverse_dictionary[i] + <span class="string">'\n'</span>)</span><br><span class="line"></span><br><span class="line">  <span class="comment"># 保存模型.</span></span><br><span class="line">  saver.save(session, os.path.join(log_dir, <span class="string">'model.ckpt'</span>))</span><br><span class="line"></span><br><span class="line">  <span class="comment"># Create a configuration for visualizing embeddings with the labels in</span></span><br><span class="line">  <span class="comment"># TensorBoard.</span></span><br><span class="line">  config = projector.ProjectorConfig()</span><br><span class="line">  embedding_conf = config.embeddings.add()</span><br><span class="line">  embedding_conf.tensor_name = embeddings.name</span><br><span class="line">  embedding_conf.metadata_path = os.path.join(log_dir, <span class="string">'metadata.tsv'</span>)</span><br><span class="line">  projector.visualize_embeddings(writer, config)</span><br><span class="line"></span><br><span class="line">writer.close()</span><br></pre></td></tr></table></figure>
+
+<h2 id="Step6：可视化embeddings。"><a href="#Step6：可视化embeddings。" class="headerlink" title="Step6：可视化embeddings。"></a>Step6：可视化embeddings。</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">plot_with_labels</span><span class="params">(low_dim_embs, labels, filename)</span>:</span></span><br><span class="line">  <span class="keyword">assert</span> low_dim_embs.shape[<span class="number">0</span>] &gt;= len(labels), <span class="string">'More labels than embeddings'</span></span><br><span class="line">  plt.figure(figsize=(<span class="number">18</span>, <span class="number">18</span>))  <span class="comment"># in inches</span></span><br><span class="line">  <span class="keyword">for</span> i, label <span class="keyword">in</span> enumerate(labels):</span><br><span class="line">    x, y = low_dim_embs[i, :]</span><br><span class="line">    plt.scatter(x, y)</span><br><span class="line">    plt.annotate(</span><br><span class="line">        label,</span><br><span class="line">        xy=(x, y),</span><br><span class="line">        xytext=(<span class="number">5</span>, <span class="number">2</span>),</span><br><span class="line">        textcoords=<span class="string">'offset points'</span>,</span><br><span class="line">        ha=<span class="string">'right'</span>,</span><br><span class="line">        va=<span class="string">'bottom'</span>)</span><br><span class="line"></span><br><span class="line">  plt.savefig(filename)</span><br><span class="line"></span><br><span class="line">tsne = TSNE(</span><br><span class="line">    perplexity=<span class="number">30</span>, n_components=<span class="number">2</span>, init=<span class="string">'pca'</span>, n_iter=<span class="number">5000</span>, method=<span class="string">'exact'</span>)</span><br><span class="line">plot_only = <span class="number">500</span></span><br><span class="line">low_dim_embs = tsne.fit_transform(final_embeddings[:plot_only, :])</span><br><span class="line">labels = [reverse_dictionary[i] <span class="keyword">for</span> i <span class="keyword">in</span> xrange(plot_only)]</span><br><span class="line">plot_with_labels(low_dim_embs, labels, os.path.join(gettempdir(),</span><br><span class="line">                                                    <span class="string">'tsne.png'</span>))</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/tensorflow/">tensorflow</a><a href="/tags/nlp/">nlp</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+  
+    
+    
+  
+</article>
+   
+    <div id="toc" class="toc-article ">
+    <div class="toc-title">目录</div>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Setp1：下载数据。这里会从下面url中下载text8-zip数据，并做解压操作，提取出数据。"><span class="toc-number">1.</span> <span class="toc-text">Setp1：下载数据。这里会从下面url中下载text8.zip数据，并做解压操作，提取出数据。</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Step2：构建词典并且把稀有词用UNK标记替换。"><span class="toc-number">2.</span> <span class="toc-text">Step2：构建词典并且把稀有词用UNK标记替换。</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Step3：生成训练skip-gram模型用的批次数据。"><span class="toc-number">3.</span> <span class="toc-text">Step3：生成训练skip-gram模型用的批次数据。</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Step4：构建skip-gram模型。"><span class="toc-number">4.</span> <span class="toc-text">Step4：构建skip-gram模型。</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Step5：训练模型。"><span class="toc-number">5.</span> <span class="toc-text">Step5：训练模型。</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Step6：可视化embeddings。"><span class="toc-number">6.</span> <span class="toc-text">Step6：可视化embeddings。</span></a></li></ol>
+</div>
+
+
+
+
+            </main>
+          </div>
+        </div>
+       
+    <footer class="site-footer">
+  <p class="site-info">
+    Proudly powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and
+    Theme by <a href="https://github.com/BosenY/Lap" target="_blank">Lap</a>
+    <br><span id="busuanzi_container_site_uv"> 
+  本站访客数<span id="busuanzi_value_site_uv"></span>人次
+</span>
+    <br>
+    
+      
+        &copy; 2019 Wayne.wy
+      
+    
+  </p>
+</footer>
+    
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-92842840-1', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+
+  </div>
+
+</div>
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.bootcss.com/vue/2.5.13/vue.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script src="/js/index.js"></script>
+<script src="/js/search.js"></script>
+
+</body>
+</html>

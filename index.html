@@ -112,6 +112,68 @@ var _hmt = _hmt || [];
 
   
     
+    <h3 class="article-title"><a href="/2019/08/25/tf-word2vec代码阅读/"><span>tf word2vec代码阅读</span></a></h3>
+    
+  
+
+  <div class="article-top-meta">
+    <span class="posted-on">
+      <a href="/2019/08/25/tf-word2vec代码阅读/" rel="bookmark">
+        <time class="entry-date published" datetime="2019-08-25T14:40:03.000Z">
+          2019-08-25
+        </time>
+      </a>
+    </span>
+    <br>
+    
+  </div>
+
+
+  
+
+  <div class="article-content">
+    <div class="entry">
+         
+        <p><a href="https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/tutorials/word2vec/word2vec_basic.py" target="_blank" rel="noopener">源码地址</a></p>
+<h2 id="Setp1：下载数据。这里会从下面url中下载text8-zip数据，并做解压操作，提取出数据。"><a href="#Setp1：下载数据。这里会从下面url中下载text8-zip数据，并做解压操作，提取出数据。" class="headerlink" title="Setp1：下载数据。这里会从下面url中下载text8.zip数据，并做解压操作，提取出数据。"></a>Setp1：下载数据。这里会从下面url中下载text8.zip数据，并做解压操作，提取出数据。</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">maybe_download</span><span class="params">(filename, expected_bytes, sha256=None)</span>:</span></span><br><span class="line">  <span class="string">"""如果数据文件不存在就下载，并且保证文件大小正确</span></span><br><span class="line"><span class="string">  输入：文件名，文件期望大小，文件哈希签名</span></span><br><span class="line"><span class="string">  输出：本地文件名</span></span><br><span class="line"><span class="string">  """</span></span><br><span class="line">  local_filename = os.path.join(gettempdir(), filename)</span><br><span class="line">  <span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(local_filename):</span><br><span class="line">    local_filename, _ = urllib.request.urlretrieve(url + filename,</span><br><span class="line">                                                   local_filename)</span><br><span class="line">  statinfo = os.stat(local_filename)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> sha256 <span class="keyword">and</span> _hash_file(local_filename) != sha256:</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">'Failed to verify '</span> + local_filename + <span class="string">' due to hash '</span></span><br><span class="line">                    <span class="string">'mismatch. Can you get to it with a browser?'</span>)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> statinfo.st_size == expected_bytes:</span><br><span class="line">    print(<span class="string">'Found and verified'</span>, filename)</span><br><span class="line">  <span class="keyword">else</span>:</span><br><span class="line">    print(statinfo.st_size)</span><br><span class="line">    <span class="keyword">raise</span> Exception(<span class="string">'Failed to verify '</span> + local_filename +</span><br><span class="line">                    <span class="string">'. Can you get to it with a browser?'</span>)</span><br><span class="line">  <span class="keyword">return</span> local_filename</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">read_data</span><span class="params">(filename)</span>:</span></span><br><span class="line">  <span class="string">"""解压出第一个文件，并转化成string形式数据</span></span><br><span class="line"><span class="string">  输入：被解压文件名</span></span><br><span class="line"><span class="string">  输出：解压出的string格式数据</span></span><br><span class="line"><span class="string">  tf.compat.as_str：alias tf.compat.as_text，Returns the input as a unicode string"""</span></span><br><span class="line">  <span class="keyword">with</span> zipfile.ZipFile(filename) <span class="keyword">as</span> f:</span><br><span class="line">    data = tf.compat.as_str(f.read(f.namelist()[<span class="number">0</span>])).split()</span><br><span class="line">  <span class="keyword">return</span> data</span><br><span class="line"></span><br><span class="line">vocabulary = read_data(filename)</span><br><span class="line">print(<span class="string">'Data size'</span>, len(vocabulary))</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+  </div>
+
+  <div class="article-footer">
+    <div class="article-meta pull-left">
+
+    
+
+    
+    
+
+    <span class="post-tags">
+      <i class="icon-tags"></i>
+        <a href="/tags/tensorflow/">tensorflow</a><a href="/tags/nlp/">nlp</a>
+    </span>
+    
+
+    </div>
+
+    
+  </div>
+  
+    
+    <h3 class="article-read"><a href="/2019/08/25/tf-word2vec代码阅读/"><span>more</span></a></h3>
+    
+  
+</article>
+
+
+
+
+
+  <article class="article-container ">
+
+  
+    
     <h3 class="article-title"><a href="/2019/08/04/AlphaGo中的蒙特卡洛树搜索和Explore/"><span>AlphaGo中的蒙特卡洛树搜索和Explore</span></a></h3>
     
   
